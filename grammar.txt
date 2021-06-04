@@ -1,0 +1,12 @@
+lang -> expr+
+expr -> appoint_expr | if_expr | while_expr
+appoint_expr -> VAR APPOINT_OP (math_expr | STRING) ENDCOM
+value -> INTEGER | STRING | VAR
+
+while_expr -> logic RFBreaket expr RFBreaket
+if_expr -> logic LFBreaket expr RFBreaket
+ELSE -> LFBreaket expr RFBreaket
+
+logic -> value (LOG_OP (logical_expr | math_expr))*
+math_expr -> (value | math_expr_wbr)(OP math_expr)*
+math_expr_wbr -> LP math_expr RP
