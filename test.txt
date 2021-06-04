@@ -1,0 +1,29 @@
+a = 6;
+b = 4;
+c = 2;
+d = LinkedList;
+d.push(6);
+d.push(2);
+d.push(3);
+d.push(5);
+while (a > b)
+{
+    if (a > c)
+    {
+        c = b - d.get(4);
+    }
+    else
+    {
+        if (b > c)
+        {
+            b = b + 4;
+        }
+        else
+        {
+            a = b - 4;
+        }
+    }
+    c = a + 6;
+}
+d.remove(3);
+a = a + 5;
