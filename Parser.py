@@ -5,51 +5,51 @@ class Parser:
         self.start = lexer
         self.LB = 0
 
-    def ST(self):
-        ST = Node('ST')
+    def T(self):
+        T = Node()
         while self.i < len(self.start) - 1:
             self.h = 1
-            expr = self.expr()
-            if expr is not None:
-                ST.children.append(expr)
+            exp = self.exp()
+            if exp is not None:
+                T.children.append(exp)
             self.i += 1
 
-        return ST
+        return T
 
-    def expr(self):
+    def exp(self):
         try:
-            expr = Node('expr', height=self.h)
+            exp = Node('exp', height=self.h)
             self.h += 1
 
             tkn = list(self.start[self.i].keys())[0]
 
             if tkn == "VAR":
                 try:
-                    appoint_expr = self.appoint_expr()
-                    expr.children.append(appoint_expr)
+                    appoint_exp = self.appoint_exp()
+                    exp.children.append(appoint_exp)
                     self.h -= 1
-                    return expr
+                    return exp
 
                 except BaseException:
-                    expr.children.append(Leaf(list(self.start[self.i].keys())[0], list(self.start[self.i].values())[0],
+                    exp.children.append(Leaf(list(self.start[self.i].keys())[0], list(self.start[self.i].values())[0],
                                               self.h))
                     self.check_next('POINT')
                     self.i += 1
                     method = self.method()
-                    expr.children.append(method)
-                    return expr
+                    exp.children.append(method)
+                    return exp
 
             elif tkn == 'WHILE':
-                while_expr = self.while_expr()
-                expr.children.append(while_expr)
+                while_exp = self.while_exp()
+                exp.children.append(while_exp)
                 self.h -= 1
-                return expr
+                return exp
 
             elif tkn == 'IF':
-                if_expr = self.if_expr()
-                expr.children.append(if_expr)
+                if_exp = self.if_exp()
+                exp.children.append(if_exp)
                 self.h -= 1
-                return expr
+                return exp
 
             else:
                 return None
@@ -68,32 +68,32 @@ class Parser:
         self.i += 1
         method.children.append(Leaf(name=list(self.start[self.i].keys())[0], value=list(self.start[self.i].values())[0],
                                     height=self.h))
-        math_expr = self.math_expr()
-        method.children.append(math_expr)
+        math_exp = self.math_exp()
+        method.children.append(math_exp)
 
         if not list(self.start[self.i].keys())[0] == 'END_COM':
             raise BaseException
 
         return method
 
-    def if_expr(self):
+    def if_exp(self):
         h = self.h
-        if_expr = Node('if_expr', height=self.h)
+        if_exp = Node('if_exp', height=self.h)
         self.h += 1
         start_height = self.h
         self.check_next('LBreaket')
-        if_expr.children.append(Leaf('LBreaket', '(', height=self.h))
+        if_exp.children.append(Leaf('LBreaket', '(', height=self.h))
         self.i += 2
         self.h += 1
         tkn = list(self.start[self.i].keys())[0]
 
         if tkn == 'VAR' or tkn == 'NUMBER' or tkn == 'LBreaket':
             logic = self.logic(ht=[start_height])
-            if_expr.children.append(logic)
+            if_exp.children.append(logic)
 
             self.h = start_height
             self.check_next('LFBreaket')
-            if_expr.children.append(Node('LFBreaket', height=start_height))
+            if_exp.children.append(Node('LFBreaket', height=start_height))
             self.i += 1
             num_L = 1
             while num_L:
@@ -110,21 +110,21 @@ class Parser:
                     if list(self.start[self.i].keys())[0] == 'RFBreaket':
                         num_L -= 1
                         break
-                    expr = self.expr()
-                    if expr is not None:
-                        if_expr.children.append(expr)
+                    exp = self.exp()
+                    if exp is not None:
+                        if_exp.children.append(exp)
 
-            if_expr.children.append(Node('RFBreaket', height=start_height))
+            if_exp.children.append(Node('RFBreaket', height=start_height))
 
             if self.i < len(self.start) - 1:
                 self.check_next('ELSE')
                 self.i += 1
                 self.check_next('LFBreaket')
                 self.h = h
-                if_expr.children.append(Node('ELSE', height=self.h))
+                if_exp.children.append(Node('ELSE', height=self.h))
                 self.h += 1
                 start_height = self.h
-                if_expr.children.append(Node('LFBreaket', height=self.h))
+                if_exp.children.append(Node('LFBreaket', height=self.h))
                 num_L = 1
 
                 while num_L:
@@ -142,30 +142,30 @@ class Parser:
                         if list(self.start[self.i].keys())[0] == 'RFBreaket':
                             num_L -= 1
                             break
-                        expr = self.expr()
-                        if expr is not None:
-                            if_expr.children.append(expr)
+                        exp = self.exp()
+                        if exp is not None:
+                            if_exp.children.append(exp)
 
-                if_expr.children.append(Node('RFBreaket', height=start_height))
-            return if_expr
+                if_exp.children.append(Node('RFBreaket', height=start_height))
+            return if_exp
 
-    def while_expr(self):
-        while_expr = Node('while_expr', height=self.h)
+    def while_exp(self):
+        while_exp = Node('while_exp', height=self.h)
         self.h += 1
         start_height = self.h
         self.check_next('LBreaket')
-        while_expr.children.append(Leaf('LBreaket', '(', height=self.h))
+        while_exp.children.append(Leaf('LBreaket', '(', height=self.h))
         self.i += 2
         self.h += 1
         tkn = list(self.start[self.i].keys())[0]
         if tkn == 'VAR' or tkn == 'NUMBER' or tkn == 'LBreaket':
             math_logic = self.logic(ht=[start_height])
-            while_expr.children.append(math_logic)
+            while_exp.children.append(math_logic)
 
             self.h = start_height
             self.check_next('LFBreaket')
             self.i += 1
-            while_expr.children.append(Node('LFBreaket', height=self.h))
+            while_exp.children.append(Node('LFBreaket', height=self.h))
             num_L = 1
 
             while num_L:
@@ -183,12 +183,12 @@ class Parser:
                     if list(self.start[self.i].keys())[0] == 'RFBreaket':
                         num_L -= 1
                         break
-                    expr = self.expr()
-                    if expr is not None:
-                        while_expr.children.append(expr)
+                    exp = self.exp()
+                    if exp is not None:
+                        while_exp.children.append(exp)
 
-            while_expr.children.append(Node('RFBreaket', height=start_height))
-            return while_expr
+            while_exp.children.append(Node('RFBreaket', height=start_height))
+            return while_exp
         else:
             raise BaseException
 
@@ -283,15 +283,15 @@ class Parser:
         if not tkn == values:
             raise BaseException
 
-    def appoint_expr(self):
-        appoint_expr = Node('appoint_expr', '=', self.h)
+    def appoint_exp(self):
+        appoint_exp = Node('appoint_exp', '=', self.h)
         self.check_next("APPOINT_OP")
         self.h += 1
-        appoint_expr.children.append(Leaf(list(self.start[self.i].keys())[0],
+        appoint_exp.children.append(Leaf(list(self.start[self.i].keys())[0],
                                           list(self.start[self.i].
                                               values())[0], self.h))
         self.i += 1
-        appoint_expr.children.append(Leaf(list(self.start[self.i].keys())[0],
+        appoint_exp.children.append(Leaf(list(self.start[self.i].keys())[0],
                                           list(self.start[self.i].
                                               values())[0], self.h))
         self.h -= 1
@@ -299,7 +299,7 @@ class Parser:
         tkn = list(self.start[self.i].keys())[0]
         if tkn == 'STR':
             self.h += 1
-            appoint_expr.children.append(Leaf('STR', list(self.start[self.i].
+            appoint_exp.children.append(Leaf('STR', list(self.start[self.i].
                                                          values())[0],
                                               self.h))
             self.check_next('END_COM')
@@ -307,37 +307,37 @@ class Parser:
 
         elif tkn == 'NUMBER' or tkn == 'LBreaket' or tkn == 'VAR':
             self.h += 1
-            math_expr = self.math_expr()
-            appoint_expr.children.append(math_expr)
+            math_exp = self.math_exp()
+            appoint_exp.children.append(math_exp)
 
         elif tkn == 'LINKED_LIST_KW':
             self.h += 1
-            appoint_expr.children.append(Leaf('LINKED_LIST_KW', list(self.start[self.i].values())[0], self.h))
+            appoint_exp.children.append(Leaf('LINKED_LIST_KW', list(self.start[self.i].values())[0], self.h))
 
-        return appoint_expr
+        return appoint_exp
 
-    def math_expr(self, ht=[]):
+    def math_exp(self, ht=[]):
         tkn = list(self.start[self.i].keys())[0]
         if not tkn == 'RBreaket' or not tkn == 'OP' or not tkn == 'POINT':
-            math_expr = Node('math_expr', height=self.h)
+            math_exp = Node('math_exp', height=self.h)
         else:
-            math_expr = ''
+            math_exp = ''
         self.h += 1
 
         if tkn == 'LBreaket':
             ht.append(self.h)
             LBreaket = self.LBreaket()
-            math_expr.children.append(LBreaket)
+            math_exp.children.append(LBreaket)
 
         elif tkn == 'RBreaket':
             self.LB -= 1
             self.h = ht.pop(-1)
             if self.LB < 0:
                 raise BaseException
-            math_expr = Node('RBreaket', value=')', height=self.h)
+            math_exp = Node('RBreaket', value=')', height=self.h)
 
         elif tkn == 'NUMBER':
-            math_expr.children.append(Leaf(list(self.start[self.i].keys())[0],
+            math_exp.children.append(Leaf(list(self.start[self.i].keys())[0],
                                            list(self.start[self.i].
                                                 values())[0],
                                            self.h))
@@ -345,7 +345,7 @@ class Parser:
             if self.i + 1 < len(self.start):
                 if list(self.start[self.i + 1].keys())[0] == 'OP':
                     self.i += 1
-                    math_expr.children.append(Leaf(list(self.start[self.i].
+                    math_exp.children.append(Leaf(list(self.start[self.i].
                                                         keys())[0],
                                                    list(self.start[self.i].
                                                         values())[0],
@@ -353,11 +353,11 @@ class Parser:
 
         elif tkn == 'OP':
             self.h -= 1
-            math_expr = Node('OP' + list(self.start[self.i].values())[0],
+            math_exp = Node('OP' + list(self.start[self.i].values())[0],
                              height=self.h)
 
         elif tkn == 'VAR':
-            math_expr.children.append(Leaf(list(self.start[self.i].keys())[0],
+            math_exp.children.append(Leaf(list(self.start[self.i].keys())[0],
                                            list(self.start[self.i].
                                                 values())[0],
                                            self.h))
@@ -365,24 +365,24 @@ class Parser:
             if self.i + 1 < len(self.start):
                 if list(self.start[self.i + 1].keys())[0] == 'OP':
                     self.i += 1
-                    math_expr.children.append(Leaf(list(self.start[self.i].
+                    math_exp.children.append(Leaf(list(self.start[self.i].
                                                         keys())[0],
                                                    list(self.start[self.i].
                                                         values())[0],
                                                    self.h))
 
         elif tkn == 'POINT':
-            math_expr = self.method()
+            math_exp = self.method()
             self.i -= 1
         elif not tkn == 'END_COM':
             raise BaseException
 
         self.i += 1
         if not list(self.start[self.i].keys())[0] == 'END_COM':
-            me = self.math_expr(ht)
-            math_expr.children.append(me)
+            me = self.math_exp(ht)
+            math_exp.children.append(me)
 
-        return math_expr
+        return math_exp
 
     def LBreaket(self):
         self.LB += 1

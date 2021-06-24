@@ -8,7 +8,7 @@ class Lexer(object):
             "NUMBER": r"^0|([1-9][0-9]*)$", "STR": r"'[^']*'", "VAR": "^[a-zA-Z0-9_]+$", "UNDEFINED": r".*[^.]*"}
 
     def __init__(self):
-        self.list_tokens = []
+        self.list_tkn = []
 
     def tkn_(self, item):
         for key in self.tkn.keys():
@@ -18,7 +18,7 @@ class Lexer(object):
     def term(self, file):
         with open(file) as file_handler:
             buffer = ''
-            last_token = ''
+            last_tkn = ''
             for line in file_handler:
                 for char in line:
                     if not len(buffer) and char == "'":
@@ -29,21 +29,21 @@ class Lexer(object):
                             buffer += char
                             continue
 
-                    if last_token == 'POINT':
+                    if last_tkn == 'POINT':
                         if not char == '(':
                             buffer += char
                             continue
                         else:
-                            self.list_tokens.append({'METHOD': buffer})
+                            self.list_tkn.append({'METHOD': buffer})
                             buffer = ''
 
-                    last_token = self.tkn_(buffer)
+                    last_tkn = self.tkn_(buffer)
                     buffer += char
                     tkn = self.tkn_(buffer)
 
                     if tkn == "UNDEFINED":
-                        if len(buffer) and not last_token == "UNDEFINED":
-                            self.list_tokens.append({last_token: buffer[:-1]})
+                        if len(buffer) and not last_tkn == "UNDEFINED":
+                            self.list_tkn.append({last_tkn: buffer[:-1]})
                         if not (buffer[-1] == ' ' or buffer[-1] == '\n'):
                             buffer = buffer[-1]
                         else:
@@ -51,4 +51,4 @@ class Lexer(object):
 
             tkn = self.tkn_(buffer)
             if not tkn == "UNDEFINED":
-                self.list_tokens.append({tkn: buffer[0]})
+                self.list_tkn.append({tkn: buffer[0]})

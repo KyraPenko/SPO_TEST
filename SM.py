@@ -66,7 +66,7 @@ class SM:
             self.variables[a] = b
 
     def abs(self, item):
-        if item.name == 'while_expr':
+        if item.name == 'while_exp':
             self.buf.append({self.nl: len(self.output)})
 
         if item.name not in Lexer.tkn and not item.name == 'METHOD':

@@ -5,11 +5,11 @@ from Parser import Parser
 if __name__ == '__main__':
     L = Lexer()
     L.term('test.txt')
-    print('Tokens:', L.list_tokens)
+    print('List of tokens:\n\n', L.list_tkn)
     try:
-        P = Parser(L.list_tokens)
-        Tree = P.ST()
-        print('Tree:\n', Tree)
+        P = Parser(L.list_tkn)
+        Tree = P.T()
+        print('\nOutput tree:\n', Tree)
         StackMachine = SM(Tree.children)
         StackMachine.start()
     except BaseException:
